@@ -1,6 +1,6 @@
 // mine evolutions
 // taniguchi kotaro
-// https://www.youtube.com/channel/UCBqoH73F31mbhyLkG3wj1HA
+// https://www.youtube.com/c/kotarotaniguchix
 
 #include <EEPROM.h>
 #include <Arduboy2.h>
@@ -695,7 +695,6 @@ byte map_musubi [16] = {0};
 int omikuji_kekka=0;
 
 int level = 0;
-bool sound = true;
 bool hatena = true;
 
 bool hi_score_update = false;
@@ -776,7 +775,10 @@ void loop() {
                   if (level > 2) level = 0;
                   break;
                 case 1:
-                  if (input & (LEFT_BUTTON | RIGHT_BUTTON)) sound = !sound;
+                  if (input & (LEFT_BUTTON | RIGHT_BUTTON)) {
+                    display.audio.toggle();
+                    display.audio.saveOnOff();
+                  }
                   break;                
                 case 2:
                   if (input & (LEFT_BUTTON | RIGHT_BUTTON)) hatena = !hatena;
@@ -816,8 +818,8 @@ void loop() {
             case 2: display.print(F("EVOLUTIONS")); break;
           }
           display.setCursor(20,32); display.print(F("SOUND:"));
-          if (sound) display.print(F("ON"));
-          else       display.print(F("OFF"));
+          if (display.audio.enabled()) display.print(F("ON"));
+          else                         display.print(F("OFF"));
           display.setCursor(20,40); display.print(F("?    :"));
           if (hatena) display.print(F("USE"));
           else        display.print(F("NO USE"));
@@ -946,7 +948,7 @@ void loop() {
             }
           }
           if (!open_update && clear_flag) {
-            if (sound) tunes.playScore(saruoto_11);
+            tunes.playScore(saruoto_11);
             state = state_omikuji2;
           }
           if (input & (LEFT_BUTTON |RIGHT_BUTTON |UP_BUTTON |DOWN_BUTTON)) {
@@ -1058,9 +1060,7 @@ void loop() {
             count++;
             if (count >= 30) {
               if (count_time < 999) {
-                if (sound) {
-                  if (!tunes.playing()) tunes.tone(523, 100);
-                }
+                if (!tunes.playing()) tunes.tone(523, 100);
                 count_time++;
               }
               count = 0;
@@ -1226,7 +1226,7 @@ void loop() {
                       game_over = true;
                       game_over_x=x;
                       game_over_y=y;
-                      if (sound) tunes.tone(1046, 250);
+                      tunes.tone(1046, 250);
                     }
                     if (map_flags[x][y].base == 0 || map_flags[x][y].base == BITMAP_BASE_YEN) {
                       if (x > initvalue[level].x_min) {
@@ -1259,7 +1259,7 @@ void loop() {
             if (game_over) {
               get_yen = false;
             }else{
-              if (sound) tunes.playScore(saruoto_11);
+              tunes.playScore(saruoto_11);
               if (hi_score[level] > count_time) {
                 hi_score[level] = count_time;
                 hi_score_update = true;
